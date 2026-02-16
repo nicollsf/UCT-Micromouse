@@ -1,5 +1,7 @@
 # UCT-Micromouse
 
+![uctmm](https://github.com/user-attachments/assets/3a6cb5ad-535b-46de-acd4-6e447fd22db5)
+
 Once you've built your micro-mouse, test it using Jesse Arendse's code 'MicroMouseTemplate' from the Github page [https://github.com/JesseJabezArendse/MicroMouseTemplate](https://github.com/JesseJabezArendse/MicroMouseTemplate).
 
 The main code repository is at [https://github.com/EEEUCT/Micromouse](https://github.com/EEEUCT/Micromouse).
