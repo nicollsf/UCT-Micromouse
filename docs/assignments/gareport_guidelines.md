@@ -16,7 +16,7 @@ The main purpose of these submissions is to demonstrate proficiency in the **ECS
 ### 2. Format & Submission Rules
 
 * **Design Report 1:** Submitted via the Microsoft Word form template and uploaded as a PDF.
-* **Design Report 2:** Submitted directly via the **Gradescope Online Assignment** interface with real-time character counters, native LaTeX equation rendering, and direct graphic file uploads.
+* **Design Report 2:** Submitted directly via the **Gradescope Online Assignment** interface with strict per-section character limits, native LaTeX equation rendering, and direct graphic file uploads.
 * **Recommended Workflow:** We strongly recommend drafting and refining your responses offline in your preferred markdown/text editor (e.g. VS Code, Word, Notion, Overleaf) to check character counts and format your equations, then copy-pasting your text directly into the respective Gradescope fields before submitting.
 
 ---

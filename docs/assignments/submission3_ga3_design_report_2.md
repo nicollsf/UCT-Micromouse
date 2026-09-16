@@ -13,7 +13,7 @@ The primary purpose is to provide evidence of proficiency in the **ECSA Design G
 ### 2. Format & Submission Rules
 To eliminate Word formatting issues and ensure seamless submission:
 *   **Submission Platform:** Submit directly into the **Gradescope Online Assignment** titled `Submission 3: GA3 Design Report 2`.
-*   **Character Limits:** Real-time character counters are enforced on each question field. Ensure your response does not exceed the designated limit for each box.
+*   **Character Limits:** Strict character limits (including spaces) are enforced during assessment for each question field. Check your character counts in your text editor before submitting.
 *   **Visual Aids:** Upload your high-resolution diagram/model/schematic directly into the Question 2 file dropzone (`.png`, `.jpg`, or `.pdf`).
 *   **LaTeX & MathJax Support:** Gradescope natively renders mathematical equations written in LaTeX format (e.g., inline math `$u[k] = K_p e[k]$$` or block math `$$\dot{\theta} = \frac{r(\omega_R - \omega_L)}{b}$$`).
 *   **Recommended Workflow (Draft Offline):** We strongly recommend drafting your responses offline in your favorite text/markdown editor (such as VS Code, Word, Notion, or Overleaf) where you can easily verify character counts and polish your equations, then copy-pasting your finalized text into the Gradescope Online Assignment fields before the deadline.
