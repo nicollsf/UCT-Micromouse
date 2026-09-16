@@ -131,7 +131,7 @@ To satisfy the ECSA Graduate Attribute 3 (Design) accreditation portfolio, you m
 *   **Assessment & Passing Criteria:** Evaluated against the ECSA GA3 Design rubric. Must demonstrate a structured design brief (3.1), alternative evaluations (3.2), and first-principles modeling (3.3).
 
 ### **Submission 3: GA3 Design Report 2 (30%)**
-*   **Task:** A second formal engineering design report (in PDF format) documenting your sensor filters, mapping state flows, routing pathfinders, or visual programming interfaces from Milestone 2.
+*   **Task:** A second formal engineering design report (submitted directly via the **Gradescope Online Assignment** interface) documenting your sensor filters, mapping state flows, routing pathfinders, or visual programming interfaces from Milestone 2.
 *   **Assessment & Passing Criteria:** Evaluated against the ECSA GA3 Design rubric. Must demonstrate implementation testing (3.4) and critical evaluation (3.5). One resubmission of this report is permitted if required to demonstrate Graduate Attribute competence.
 
 ### **Submission 4: Final Maze Solver Code & Demo (25%)**

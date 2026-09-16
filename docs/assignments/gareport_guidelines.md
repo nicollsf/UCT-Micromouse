@@ -14,10 +14,10 @@ The main purpose of these submissions is to demonstrate proficiency in the **ECS
 ---
 
 ### 2. Format & Submission Rules
-To ensure standardization for external accreditation audits, you must adhere to the following formatting constraints:
-* **Template:** You must use the Microsoft Word form template provided at [EEE3097_8_9S_designreport.docx](EEE3097_8_9S_designreport.docx).
-* **Form Protection:** **Do not disable the "Protect Form" functionality in MS Word**. The template enforces strict layout limits and character constraints for each section.
-* **Output:** Convert the finalized document to **PDF** for submission to Gradescope (named `Design_Report_[1/2]_[StudentNumber].pdf`).
+
+* **Design Report 1:** Submitted via the Microsoft Word form template and uploaded as a PDF.
+* **Design Report 2:** Submitted directly via the **Gradescope Online Assignment** interface with real-time character counters, native LaTeX equation rendering, and direct graphic file uploads.
+* **Recommended Workflow:** We strongly recommend drafting and refining your responses offline in your preferred markdown/text editor (e.g. VS Code, Word, Notion, Overleaf) to check character counts and format your equations, then copy-pasting your text directly into the respective Gradescope fields before submitting.
 
 ---
 
@@ -45,3 +45,8 @@ To encourage concise, high-density engineering communication and prevent AI-gene
 *   **Design Process Description (Max 700 chars):** Document your structured evaluation of at least two alternative solutions.
 *   **Design Implementation (Max 700 chars):** Model your chosen design using first-principles dynamic equations or script flow charts.
 *   **Design Evaluation & Testing (Max 700 chars):** Verify performance under physical perturbations (slip, motor asymmetry) and discuss model deviations.
+
+---
+
+### 5. Guidance & Common Pitfalls Reference
+Before submitting, thoroughly consult the **[GA3 Common Pitfalls & How to Meet Requirements Guide](ga3_common_pitfalls_guide.md)** for section-by-section criteria, common failure modes, and concrete engineering exemplars.
