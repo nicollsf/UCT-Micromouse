@@ -232,3 +232,10 @@ Use this index to resolve common tasks instantly without additional user prompti
      cp build/bin/micropython.bin firmware/binaries/
      ```
   * 3. Stage, commit, and push `firmware/binaries/micropython.bin` to main.
+
+* **GA3 Report Automated Evaluation & Anti-Inflation Protocol (Submission 3 / Design Report 2 & Beyond)**:
+
+  * **Strict Prohibition of Half-Band (`+0.5`) Stacking**: Automated rubrics must NEVER combine `+0.5` adjustment items on top of base bands (`Acceptable 2.0` or `Marginal 1.0`). Every question must resolve to exactly one discrete score tier (`3.0`, `2.0`, `1.0`, or `0.0`).
+  * **Target Cohort Mean**: Anchor the grading engine to a standard academic mean of **~65% (`13.0 / 20.0`)**. Standard competent work without exceptional mathematical depth or multi-trial statistical telemetry must receive clean **`2.0 / 3.0`**, reserving `2.5` and `3.0` exclusively for distinction-level Tier A rigor.
+  * **Zero Prompt Instruction Bleed**: Extraction scripts must strip all prompt header text before calculating section character limits to prevent accidental truncation.
+
