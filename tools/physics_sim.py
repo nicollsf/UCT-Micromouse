@@ -63,8 +63,10 @@ def get_intersection(ray_start, ray_dir, line_start, line_end):
         return (ix, iy, u)
     return None
 
-def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
-    """Generates a randomized DFS-based perfect maze compliant with Micromouse rules."""
+def generate_random_maze(grid_rows=4, grid_cols=6, block_dim=0.20, seed=None, target_pos=None):
+    """Generates a randomized DFS-based maze compliant with Micromouse rules.
+    Default: 4 rows x 6 columns with a 2x2 open target room.
+    """
     import random
     if seed is not None:
         random.seed(seed)
@@ -73,20 +75,26 @@ def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
     stack = []
     
     # Internal walls tracking
-    v_walls = set((c, r) for c in range(1, grid_size) for r in range(grid_size))
-    h_walls = set((c, r) for c in range(grid_size) for r in range(1, grid_size))
+    v_walls = set((c, r) for c in range(1, grid_cols) for r in range(grid_rows))
+    h_walls = set((c, r) for c in range(grid_cols) for r in range(1, grid_rows))
     
-    # Center target cells
-    cx = grid_size // 2
-    cy = grid_size // 2
+    # 2x2 Target room cells: default placed towards the opposite quadrant or center
+    # For a 4x6 grid, default (cx, cy) = (4, 2) makes cells {(3,1), (3,2), (4,1), (4,2)} or (cols//2, rows//2)
+    if target_pos:
+        cx, cy = target_pos
+    else:
+        # Place 2x2 room in upper-right / center area, ensuring 1 <= cx <= grid_cols - 1 and 1 <= cy <= grid_rows - 1
+        cx = max(1, min(grid_cols - 1, grid_cols - 2 if grid_cols >= 4 else grid_cols // 2))
+        cy = max(1, min(grid_rows - 1, grid_rows // 2))
+        
     tcs = {(cx - 1, cy - 1), (cx - 1, cy), (cx, cy - 1), (cx, cy)}
     
     def get_neighbors(cell):
         c, r = cell
         n = []
-        if r < grid_size - 1: n.append(('N', (c, r + 1)))
+        if r < grid_rows - 1: n.append(('N', (c, r + 1)))
         if r > 0:             n.append(('S', (c, r - 1)))
-        if c < grid_size - 1: n.append(('E', (c + 1, r)))
+        if c < grid_cols - 1: n.append(('E', (c + 1, r)))
         if c > 0:             n.append(('W', (c - 1, r)))
         return n
         
@@ -95,12 +103,13 @@ def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
     
     # Rule 1.3: Start cell (0, 0) has walls on three sides.
     # Exit is strictly to (1, 0) (East)
-    # So we remove the wall between (0, 0) and (1, 0) at the start
-    v_walls.remove((1, 0))
+    # Remove the wall between (0, 0) and (1, 0) at the start
+    if (1, 0) in v_walls:
+        v_walls.remove((1, 0))
     visited.add((1, 0))
     curr = (1, 0)
     
-    while len(visited) < grid_size * grid_size:
+    while len(visited) < grid_rows * grid_cols:
         # Get unvisited neighbors
         neighbors = [nb for nb in get_neighbors(curr) if nb[1] not in visited]
         if neighbors:
@@ -109,13 +118,13 @@ def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
             
             # Remove the wall between curr and next_cell
             if dir_to == 'N':
-                h_walls.remove((c, r + 1))
+                h_walls.discard((c, r + 1))
             elif dir_to == 'S':
-                h_walls.remove((c, r))
+                h_walls.discard((c, r))
             elif dir_to == 'E':
-                v_walls.remove((c + 1, r))
+                v_walls.discard((c + 1, r))
             elif dir_to == 'W':
-                v_walls.remove((c, r))
+                v_walls.discard((c, r))
                 
             if next_cell in tcs:
                 # Mark all target cells as visited
@@ -135,7 +144,7 @@ def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
             curr = stack.pop()
         else:
             # Fallback if stack is empty but some cells are not visited
-            remaining = set((c, r) for c in range(grid_size) for r in range(grid_size)) - visited
+            remaining = set((c, r) for c in range(grid_cols) for r in range(grid_rows)) - visited
             if remaining:
                 curr = random.choice(list(remaining))
                 visited.add(curr)
@@ -162,7 +171,7 @@ def generate_random_maze(grid_size=10, block_dim=0.20, seed=None):
     for c, r in h_walls:
         segments.append(((c * block_dim, r * block_dim), ((c + 1) * block_dim, r * block_dim)))
         
-    return segments
+    return segments, (cx, cy)
 
 class PhysicsSimulator:
     def __init__(self, maze_type="empty", imbalance=0.0, slip=0.0, headless=False, seed=None, config=None):
@@ -198,9 +207,11 @@ class PhysicsSimulator:
             (0.045, -0.02, -math.pi/2)  # Right ToF
         ]
         
-        self.grid_size = 10
+        self.grid_rows = 4
+        self.grid_cols = 6
         self.block_dim = 0.20
         self.wall_thickness = 0.006
+        self.target_room = None
         
         if config:
             if "robot" in config:
@@ -246,7 +257,8 @@ class PhysicsSimulator:
                     self.sensor_offsets.append((s["x"], s["y"], s["theta"]))
             if "maze" in config:
                 mz = config["maze"]
-                self.grid_size = mz.get("grid_size", self.grid_size)
+                self.grid_rows = mz.get("grid_rows", mz.get("grid_size", self.grid_rows))
+                self.grid_cols = mz.get("grid_cols", mz.get("grid_size", self.grid_cols))
                 self.block_dim = mz.get("block_dim", self.block_dim)
                 self.wall_thickness = mz.get("wall_thickness", self.wall_thickness)
             
@@ -278,14 +290,9 @@ class PhysicsSimulator:
         self.build_maze()
         
     def reset_state(self):
-        # Starting position: center of cell (2,2) for empty map to avoid boundaries,
-        # and center of start cell (0,0) for maze maps.
-        if self.maze_type == "empty":
-            self.x = 0.5
-            self.y = 0.5
-        else:
-            self.x = 0.1
-            self.y = 0.1
+        # Starting position: center of start cell (0,0) (or (0.1, 0.1) in world meters)
+        self.x = self.block_dim / 2.0
+        self.y = self.block_dim / 2.0
         self.theta = 0.0  # Facing East
         self.v_l = 0.0
         self.v_r = 0.0
@@ -306,32 +313,35 @@ class PhysicsSimulator:
         self.is_turning = False
         
     def build_maze(self):
-        self.maze_width = self.grid_size * self.block_dim
-        self.maze_height = self.grid_size * self.block_dim
+        self.maze_width = self.grid_cols * self.block_dim
+        self.maze_height = self.grid_rows * self.block_dim
         
         # Outer border walls
-        self.walls.append(((0, 0), (self.maze_width, 0))) # Top
-        self.walls.append(((0, self.maze_height), (self.maze_width, self.maze_height))) # Bottom
-        self.walls.append(((0, 0), (0, self.maze_height))) # Left
-        self.walls.append(((self.maze_width, 0), (self.maze_width, self.maze_height))) # Right
+        self.walls.append(((0, 0), (self.maze_width, 0))) # South
+        self.walls.append(((0, self.maze_height), (self.maze_width, self.maze_height))) # North
+        self.walls.append(((0, 0), (0, self.maze_height))) # West
+        self.walls.append(((self.maze_width, 0), (self.maze_width, self.maze_height))) # East
         
         if self.maze_type == "spiral":
-            # Generate a proper concentric spiral maze for grid_size x grid_size
-            for k in range(1, self.grid_size // 2):
-                w = k * self.block_dim
-                limit = self.maze_width - w
+            # Generate a concentric spiral maze matching grid dimensions
+            max_rings = min(self.grid_rows, self.grid_cols) // 2
+            for k in range(1, max_rings):
+                w_x = k * self.block_dim
+                w_y = k * self.block_dim
+                limit_x = self.maze_width - w_x
+                limit_y = self.maze_height - w_y
                 
-                # Bottom wall: Y = w, X from w - block_dim to limit
-                self.walls.append(((w - self.block_dim, w), (limit, w)))
-                # Right wall: X = limit, Y from w to limit
-                self.walls.append(((limit, w), (limit, limit)))
-                # Top wall: Y = limit, X from w to limit
-                self.walls.append(((w, limit), (limit, limit)))
-                # Left wall: X = w, Y from w + block_dim to limit (leaving a gap of size block_dim at the bottom-left)
-                self.walls.append(((w, w + self.block_dim), (w, limit)))
+                # Bottom wall: Y = w_y, X from w_x - block_dim to limit_x
+                self.walls.append(((w_x - self.block_dim, w_y), (limit_x, w_y)))
+                # Right wall: X = limit_x, Y from w_y to limit_y
+                self.walls.append(((limit_x, w_y), (limit_x, limit_y)))
+                # Top wall: Y = limit_y, X from w_x to limit_x
+                self.walls.append(((w_x, limit_y), (limit_x, limit_y)))
+                # Left wall: X = w_x, Y from w_y + block_dim to limit_y
+                self.walls.append(((w_x, w_y + self.block_dim), (w_x, limit_y)))
         elif self.maze_type == "random":
-            # Generate and add randomized DFS maze walls
-            random_walls = generate_random_maze(self.grid_size, self.block_dim, self.seed)
+            # Generate and add randomized DFS maze walls with 2x2 target room
+            random_walls, self.target_room = generate_random_maze(self.grid_rows, self.grid_cols, self.block_dim, self.seed)
             self.walls.extend(random_walls)
                 
     def step(self, pwm_l, pwm_r, dt):
@@ -534,8 +544,10 @@ def main():
     if args.headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
         
-    pygame.init()
-    width, height = 600, 600
+    # Scale Pygame window to match maze aspect ratio (e.g. 600 wide x 400 high for 4x6)
+    aspect_ratio = sim.maze_height / max(1e-3, sim.maze_width)
+    width = 720
+    height = int(width * aspect_ratio)
     if args.headless:
         # Headless rendering uses an offscreen surface
         screen = pygame.Surface((width, height))
@@ -591,6 +603,7 @@ def main():
         print("\n" + "=" * 50)
         print("=== ACTIVE SIMULATED MOUSE PARAMETERS ===")
         print(f"  Seed                  : {active_seed}")
+        print(f"  Maze Geometry         : {sim.grid_rows} rows x {sim.grid_cols} cols ({sim.maze_height:.2f}m x {sim.maze_width:.2f}m)")
         print(f"  Dead Band (Left/Right): {sim.dead_band_l:.2f} / {sim.dead_band_r:.2f} PWM")
         print(f"  Motor Gain Imbalance  : {sim.imbalance * 100:+.2f}%")
         print(f"  Traction Slip Coeff   : {sim.slip_coeff * 100:.2f}%")
@@ -697,8 +710,8 @@ def main():
             
             # Draw grid blocks
             scale = width / sim.maze_width
-            for i in range(sim.grid_size):
-                for j in range(sim.grid_size):
+            for i in range(sim.grid_cols):
+                for j in range(sim.grid_rows):
                     rect = pygame.Rect(i*sim.block_dim*scale, j*sim.block_dim*scale, sim.block_dim*scale, sim.block_dim*scale)
                     pygame.draw.rect(screen, (35, 35, 35), rect, 1)
                     
@@ -958,6 +971,9 @@ def main():
                     "max_displacement": max_displacement,
                     "time": sim.time,
                     "crashed": crashed,
+                    "grid_rows": sim.grid_rows,
+                    "grid_cols": sim.grid_cols,
+                    "target_room": sim.target_room,
                     "trajectory": sim.trajectory
                 }
                 with open(args.json_log, "w") as f:

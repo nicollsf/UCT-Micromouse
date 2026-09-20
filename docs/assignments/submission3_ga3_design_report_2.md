@@ -3,19 +3,31 @@
 
 ---
 
-### 1. Objective
+### 1. Objective & Assessment Context
 Submit a formal engineering design report documenting a structured design process conducted in relation to your **sensor filtering, maze mapping state flows, or routing pathfinder designs** from Milestone 2.
 
-The primary purpose is to provide evidence of proficiency in the **ECSA Design Graduate Attribute (GA3)**. This is a mandatory requirement to pass the course.
+The primary purpose is to provide verifiable, defensible evidence of proficiency in the **ECSA Design Graduate Attribute (GA3)**. Meeting GA3 is a mandatory statutory requirement to pass the course.
 
 ---
 
-### 2. Format & Submission Rules
+### 2. Formative Calibration & Elevated Assessment Standards
+
+> [!IMPORTANT]
+> **Report 1 was a Formative Baseline — Report 2 Enforces Senior Engineering Rigor:**
+> * **Formative Calibration:** In Design Report 1 (20%), markers gave students the benefit of the doubt on early conceptual designs and preliminary implementations to provide constructive diagnostic feedback.
+> * **Senior Engineering Standards (30% Weighting):** Design Report 2 carries **1.5× the weight** of Report 1. Assessment will strictly reflect final-year engineering science standards.
+> * **Calibrated Grading Expectations:** A standard, pedestrian submission that merely satisfies the basic template prompts with descriptive text, informal trade-off comparisons, or single-run test data will receive a solid baseline mark of **$2.0 / 3.0$ (66.7% / Lower Second band)**.
+> * **Earning High Marks ($>75\%$ / First Class):** Scores in the **$2.5–3.0 / 3.0$** range are strictly reserved for submissions demonstrating deep technical rigor: formal first-principles equations ($u[k], T_s$, differential kinematics, $z$-domain models), analytical boundary proofs ($a_{\text{lat}} \le \mu g$), weighted decision matrices with numerical criteria, and multi-trial statistical telemetry ($\mu \pm \sigma$).
+> * **GA3 Remediation:** For students who received $<1.5/3.0$ on any section in Report 1, Report 2 represents your primary statutory opportunity to remediate and clear all ECSA GA3 sub-minima.
+
+---
+
+### 3. Format & Submission Rules
 To eliminate Word formatting issues and ensure seamless submission:
 *   **Submission Platform:** Submit directly into the **Gradescope Online Assignment** titled `Submission 3: GA3 Design Report 2`.
 *   **Character Limits:** Strict character limits (including spaces) are enforced during assessment for each question field. Check your character counts in your text editor before submitting.
 *   **Visual Aids:** Upload your high-resolution diagram/model/schematic directly into the Question 2 file dropzone (`.png`, `.jpg`, or `.pdf`).
-*   **LaTeX & MathJax Support:** Gradescope natively renders mathematical equations written in LaTeX format (e.g., inline math `$u[k] = K_p e[k]$$` or block math `$$\dot{\theta} = \frac{r(\omega_R - \omega_L)}{b}$$`).
+*   **LaTeX & MathJax Support:** Gradescope natively renders mathematical equations written in LaTeX format (e.g., inline math `$u[k] = K_p e[k]$` or block math `$$\dot{\theta} = \frac{r(\omega_R - \omega_L)}{b}$$`).
 *   **Recommended Workflow (Draft Offline):** We strongly recommend drafting your responses offline in your favorite text/markdown editor (such as VS Code, Word, Notion, or Overleaf) where you can easily verify character counts and polish your equations, then copy-pasting your finalized text into the Gradescope Online Assignment fields before the deadline.
 
 ---

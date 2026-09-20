@@ -376,6 +376,15 @@ def main():
         write_results(0.0, f"System Error: Simulator backend script 'physics_sim.py' not found (looked in {SOURCE_DIR}, {repo_root}/tools).")
         return
         
+    # Check for student-submitted dynamic simulation config (sim_config.json)
+    student_config = None
+    for candidate in ["sim_config.json", "simulation_config.json"]:
+        p = os.path.join(SUBMISSION_DIR, candidate)
+        if os.path.exists(p):
+            student_config = p
+            print(f"[Grader] Discovered Student Identified Simulation Config: {student_config}")
+            break
+
     total_score = 0.0
     gradescope_tests = []
     
@@ -395,6 +404,8 @@ def main():
             "--max-time", str(getattr(test_suite, "TIME_LIMIT", 45.0)),
             "--seed", str(getattr(test_suite, "SEED", 42) + idx)
         ]
+        if student_config:
+            sim_cmd.extend(["--config", student_config])
         
         # Clean up old trajectory file
         if os.path.exists(TRAJECTORY_JSON):

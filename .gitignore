@@ -41,6 +41,9 @@ solutions/
 # External submodules/libraries
 external/Micromouse/
 external/src/
+external/firmware/
+.ccmux/
+main_usedtowork.py
 
 # Local diagnostic log files
 *.log

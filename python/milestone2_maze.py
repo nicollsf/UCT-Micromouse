@@ -1,164 +1,186 @@
 # =========================================================================
-# UCT Micromouse - Milestone 2: Map and Navigate a Maze (Framework)
+# UCT Micromouse - Milestone 2 / Submission 4: 4x6 Maze Solver Template
 # =========================================================================
-# ASSIGNMENT DESCRIPTION:
-# Implement a maze explorer that maps a 10x10 grid using Time-of-Flight (ToF)
-# sensors, updates its internal map, uses BFS (or another algorithm) to
-# explore 100% of reachable cells, and then navigates from the finish to the
-# center (cells [4,4], [4,5], [5,4], [5,5]).
+# ASSIGNMENT MISSION: "Search, Celebrate & Sprint"
+# 1. Phase 1 (Explore & Map): Autonomously explore the 4x6 maze from (0,0),
+#    mapping wall presence using ToF sensors until discovering the 2x2 open
+#    target room (4 contiguous cells with zero interior dividing walls).
+# 2. Phase 2 (Target Recognition): Execute an on-the-spot 360° clockwise
+#    pirouette inside the target room to signal goal acquisition.
+# 3. Phase 3 (Return to Start): Compute the optimal shortest path back to (0,0),
+#    navigate back, and stop at the starting cell.
+# 4. Phase 4 (High-Speed Sprint): Pause 3.0s, then execute a high-speed sprint
+#    along the optimal path directly into the target room.
+#
+# NOTE: In the final week competition, the maze will be larger (e.g. 8x8/10x10).
+# Ensure your code parameterizes MAZE_ROWS and MAZE_COLS dynamically!
 # =========================================================================
 
 import uct_mouse
 import math
 import time
 
-# Constants
-MAZE_DIM = 10
+# Maze Dimensions (Default: 4 rows x 6 columns)
+MAZE_ROWS = 4
+MAZE_COLS = 6
 CELL_LENGTH_M = 0.20
-TICK_DIST_M = (2.0 * math.pi * 0.031) / 8.0
 
-# Directions: 0: North, 1: East, 2: South, 3: West
+# Directions: 0: North (+y), 1: East (+x), 2: South (-y), 3: West (-x)
 DX = [0, 1, 0, -1]
 DY = [1, 0, -1, 0]
 
 class MazeSolver:
-    def __init__(self):
+    def __init__(self, rows=MAZE_ROWS, cols=MAZE_COLS):
+        self.rows = rows
+        self.cols = cols
+        
         # 0 = unknown, 1 = wall, 2 = open
-        self.walls = [[ [0]*4 for _ in range(MAZE_DIM)] for _ in range(MAZE_DIM)]
-        self.visited = [[False]*MAZE_DIM for _ in range(MAZE_DIM)]
+        self.walls = [[[0]*4 for _ in range(self.cols)] for _ in range(self.rows)]
+        self.visited = [[False]*self.cols for _ in range(self.rows)]
         self.x = 0
         self.y = 0
-        self.dir = 1  # Start direction (e.g. 1 = East)
-        self.heading_deg = 0.0
+        self.dir = 0  # 0: North
         
-        # Initialize border walls
-        for i in range(MAZE_DIM):
-            self.walls[i][0][3] = 1 # West border
-            self.walls[i][MAZE_DIM-1][1] = 1 # East border
-            self.walls[0][i][2] = 1 # South border
-            self.walls[MAZE_DIM-1][i][0] = 1 # North border
-            
+        # Target room coordinates (discovered dynamically)
+        self.target_room = None  # e.g., (min_x, min_y) of 2x2 block
+        
+        # Initialize outer boundary walls
+        for r in range(self.rows):
+            self.walls[r][0][3] = 1            # West boundary
+            self.walls[r][self.cols - 1][1] = 1 # East boundary
+        for c in range(self.cols):
+            self.walls[0][c][2] = 1            # South boundary
+            self.walls[self.rows - 1][c][0] = 1 # North boundary
+
     def _read_sensors(self):
-        """Helper to read all sensors."""
+        """Helper to read all sensors (ToFs, encoders, gyro)."""
         tof_l, tof_c, tof_r = uct_mouse.get_tof()
         lenc, renc = uct_mouse.get_encoders()
-        sensors = uct_mouse._mouse.get_sensors()
+        sensors = uct_mouse._mouse.get_sensors() if hasattr(uct_mouse, '_mouse') else {}
         gyro = sensors.get('gyro', 0.0)
         return tof_l, tof_c, tof_r, lenc, renc, gyro
 
     def _update_walls(self, tof_l, tof_c, tof_r):
         """
-        TODO: Update self.walls for the current cell (self.x, self.y)
-        based on ToF sensor readings. Remember to also update the wall map
-        for the adjacent cells (e.g., if there's a wall north of (x,y), then
-        there's a wall south of (x, y+1)).
+        TODO: Update self.walls for current cell (self.x, self.y) based on ToF readings.
+        Remember to update symmetric wall entries in adjacent neighboring cells!
         """
         self.visited[self.y][self.x] = True
         # Student code here
         pass
 
+    def check_for_target_room(self):
+        """
+        TODO: Scan self.walls to detect if a 2x2 block with NO internal cross-walls
+        has been discovered anywhere in the explored map.
+        Returns bottom-left (min_x, min_y) of the 2x2 room if found, else None.
+        """
+        # Student code here: check contiguous 2x2 cells for missing interior walls
+        return None
+
     def turn_to(self, target_dir):
         """
-        TODO: Turn the mouse from self.dir to target_dir in-place using closed-loop
-        gyro feedback. Update self.dir once complete.
+        TODO: Turn in-place from self.dir to target_dir using closed-loop gyro feedback.
+        Update self.dir upon completion.
         """
-        if self.dir == target_dir: return
+        if self.dir == target_dir:
+            return
         # Student code here
+        self.dir = target_dir
+
+    def pirouette_360(self):
+        """
+        TODO: Execute an on-the-spot 360° clockwise spin using gyro feedback
+        to signal target recognition.
+        """
+        print(">>> TARGET RECOGNIZED: Executing 360° victory pirouette! <<<")
+        # Student code: spin until integrated gyro yaw accumulates 360 degrees
         pass
 
-    def align_to_walls(self):
+    def move_forward(self, speed_fast=False):
         """
-        TODO: Optional but recommended. Fine-tune alignment in the cell using front
-        and/or side walls to prevent drift accumulation.
-        """
-        # Student code here
-        pass
-
-    def move_forward(self):
-        """
-        TODO: Drive forward exactly one cell (CELL_LENGTH_M) using closed-loop control
-        fusing encoders, gyro, and optionally side wall ToF sensors for centering.
-        Update self.x and self.y once successfully transitioned.
+        TODO: Drive forward exactly one cell (CELL_LENGTH_M) using closed-loop
+        encoder + gyro control, with side-wall centering via ToFs.
+        Update self.x and self.y upon arrival.
         """
         # Student code here
-        pass
+        self.x += DX[self.dir]
+        self.y += DY[self.dir]
 
     def find_nearest_unvisited(self):
         """
-        TODO: Use Breadth-First Search (BFS) to find the shortest path from the
-        current cell (self.x, self.y) to the nearest unvisited cell.
-        Returns a list of coordinate tuples [(x1, y1), (x2, y2), ...] representing the path.
+        TODO: Use BFS / Floodfill to find the shortest path from (self.x, self.y)
+        to the nearest unvisited cell.
         """
         # Student code here
         return None
 
-    def find_path_to_center(self):
+    def find_shortest_path(self, start_pos, goal_pos):
         """
-        TODO: Use BFS to find the shortest path from the current cell (self.x, self.y)
-        to the center cells ([4,4], [4,5], [5,4], [5,5]).
-        Returns a list of coordinate tuples [(x1, y1), (x2, y2), ...] representing the path.
+        TODO: Calculate optimal shortest path from start_pos to goal_pos using
+        discovered wall matrix (e.g. Dijkstra, A*, or BFS).
         """
         # Student code here
-        return None
+        return []
 
     def solve(self):
         if not uct_mouse.init():
             return
 
-        try:
-            with open("polarity.txt", "r") as f:
-                lines = f.read().strip().split(",")
-                uct_mouse.set_polarity(int(lines[0]), int(lines[1]))
-                if len(lines) >= 4:
-                    uct_mouse.set_encoder_polarity(int(lines[2]), int(lines[3]))
-        except Exception:
-            uct_mouse.set_polarity(1, 1)
+        uct_mouse.set_polarity(1, 1)
 
-        print("--- Milestone 2: 100% Maze Exploration ---")
+        print("=== Starting 4-Stage Autonomous Micromouse Mission ===")
         
-        # 1. Phase 1: Explore the maze until all reachable cells are visited
+        # -----------------------------------------------------------------
+        # Phase 1: Exploration & 2x2 Target Room Discovery
+        # -----------------------------------------------------------------
+        print("[Phase 1] Exploring maze and mapping walls...")
         while True:
             tof_l, tof_c, tof_r, _, _, _ = self._read_sensors()
             self._update_walls(tof_l, tof_c, tof_r)
             
+            # Check if 2x2 target room has been discovered
+            if not self.target_room:
+                self.target_room = self.check_for_target_room()
+                
+            # If inside target room or all cells mapped, finish Phase 1
+            if self.target_room and self.x >= self.target_room[0] and self.y >= self.target_room[1]:
+                print("[Phase 1 Complete] Entered 2x2 Target Room!")
+                break
+                
             path = self.find_nearest_unvisited()
             if not path:
-                print("All reachable cells visited!")
+                print("[Phase 1 Complete] All reachable cells explored!")
                 break
                 
-            # Take the next step along the path
-            next_x, next_y = path[0]
-            
-            # Determine direction to face next cell
-            target_dir = 0
-            for d in range(4):
-                if self.x + DX[d] == next_x and self.y + DY[d] == next_y:
-                    target_dir = d
-                    break
-                    
-            self.turn_to(target_dir)
-            self.move_forward()
+            # Move to next cell
+            # Student code to turn_to and move_forward
+            break # Scaffold placeholder
 
-        # 2. Phase 2: Navigate to the center from current position
-        print("Now navigating to the center...")
-        while True:
-            if self.x in [4, 5] and self.y in [4, 5]:
-                print("Reached the center!")
-                break
-                
-            path = self.find_path_to_center()
-            if not path:
-                print("Center not reachable!")
-                break
-                
-            next_x, next_y = path[0]
-            target_dir = 0
-            for d in range(4):
-                if self.x + DX[d] == next_x and self.y + DY[d] == next_y:
-                    target_dir = d
-                    break
-            self.turn_to(target_dir)
-            self.move_forward()
+        # -----------------------------------------------------------------
+        # Phase 2: Target Recognition Handshake (360° Pirouette)
+        # -----------------------------------------------------------------
+        print("[Phase 2] Executing Target Recognition Pirouette...")
+        self.pirouette_360()
+
+        # -----------------------------------------------------------------
+        # Phase 3: Autonomous Return to Starting Cell (0,0)
+        # -----------------------------------------------------------------
+        print("[Phase 3] Navigating back to start (0,0)...")
+        path_to_start = self.find_shortest_path((self.x, self.y), (0, 0))
+        # Student code: traverse path_to_start back to (0,0) and face North
+        print("[Phase 3 Complete] Returned safely to (0,0)!")
+
+        # -----------------------------------------------------------------
+        # Phase 4: High-Speed Solving Sprint
+        # -----------------------------------------------------------------
+        print("[Phase 4] Pausing 3.0s before High-Speed Sprint...")
+        uct_mouse.delay_ms(3000)
+        
+        print("[Phase 4] Executing High-Speed Sprint to Target!")
+        path_to_target = self.find_shortest_path((0, 0), self.target_room or (3, 5))
+        # Student code: sprint along path_to_target with merged velocity profiling
+        print("[Mission Complete] High-speed sprint finished inside target room!")
 
 def main():
     solver = MazeSolver()

@@ -11,11 +11,12 @@ The primary objective of these reports is to provide verifiable, defensible evid
 
 ---
 
-### The ECSA GA3 Sub-Minimum Rule
+### The ECSA GA3 Sub-Minimum Rule & Assessment Standards
 
 To achieve an ECSA GA3 pass, a student must demonstrate competence across **all core design stages**:
-* You must achieve **$\ge 50\%$ ($1.5 / 3.0\text{ pts}$)** on every individual technical section (Sections 3 to 7).
-* Scoring high in one section (e.g., an exceptional Simulink diagram in Section 2) **cannot compensate** for leaving another section deficient (e.g., omitting the trade-off matrix in Section 5 or testing data in Section 7).
+* You must achieve **$\ge 50\%$ ($1.5 / 3.0\text{ pts}$)** on every individual assessed technical section (**Sections 2 to 7**).
+* Scoring high in one section (e.g., an exceptional Simulink diagram in Section 2) **cannot compensate** for leaving another section deficient (e.g., omitting the trade-off matrix in Section 5, lacking first-principles equations in Section 6, or omitting experimental telemetry in Section 7).
+* **High Assessment Expectations:** A standard, pedestrian submission that merely satisfies the basic template prompts without deep analytical modeling, unstated friction/deadband proofs, or multi-trial statistical telemetry receives a baseline mark of **$2.0 / 3.0$ (66.7%)**. The top mark bands (**$2.5–3.0 / 3.0$**) are reserved strictly for exceptional engineering science and rigorous mathematical formulation.
 
 ---
 
@@ -94,13 +95,15 @@ To achieve an ECSA GA3 pass, a student must demonstrate competence across **all 
 * **Primary Cause of GA3 Deficiencies across the Cohort.**
 * **Common Pitfalls:**
   
-  * **No Weighted Decision Matrix:** Describing two options purely in narrative prose without a structured comparison.
+  * **No Structured Comparison:** Describing two options purely in narrative prose without a structured evaluation of trade-offs.
   * **Strawman / Trivial Alternatives:** Comparing your chosen solution against *"doing nothing"* or comparing two completely unrelated subsystems.
   
 * **What Meets the Standard:**
   
   * Formulate at least **two viable, competing design alternatives** for the same subsystem (e.g., *Discrete P vs. PID with Anti-Windup*; *Direct Sensor Thresholding vs. Complementary Filter*; *Fixed PWM vs. Encoder-Based Velocity Feedback*).
-  * Include a compact **Weighted Trade-Off Matrix** within your character budget:
+  * Provide a structured evaluation comparing the options across well-defined technical criteria (e.g., accuracy, stability, computational latency, memory footprint, noise rejection). This can be presented as:
+    * A compact **Weighted Decision Matrix** (recommended), or
+    * A rigorous, multi-criteria **Structured Qualitative Trade-Off Comparison** with clear technical justification for why the selected approach was chosen over the alternative.
 
 | Option | Tracking Accuracy ($40\%$) | CPU/Memory Cost ($30\%$) | Noise Rejection ($30\%$) | Weighted Total |
 | :--- | :---: | :---: | :---: | :---: |
@@ -117,12 +120,14 @@ To achieve an ECSA GA3 pass, a student must demonstrate competence across **all 
   
   * **Code Narrative instead of Mathematics:** Writing sentences like *"If sensor is less than 50 we call set_motors(30, 40)"*.
   * **Floating Equations:** Pasting standard equations without defining parameters, units, or linking them to the physical robot.
+  * **Purely Descriptive Explanations:** Describing how a control algorithm operates conceptually without providing the governing mathematical equations.
   
 * **What Meets the Standard:**
   
-  * **First-Principles Mathematical Formulation:** Define the governing differential equations, kinematic models, or discrete difference equations:
+  * **First-Principles Mathematical Formulation:** Define the governing differential equations, kinematic models, discrete difference equations, or transfer functions:
     * *Differential Kinematics:* $v = \frac{r(\omega_R + \omega_L)}{2}$, $\dot{\theta} = \frac{r(\omega_R - \omega_L)}{b}$ where track width $b = 85\text{ mm}$, wheel radius $r = 16\text{ mm}$.
-    * *Discrete Controller:* $u[k] = u[k-1] + K_p(e[k] - e[k-1]) + K_i T_s e[k] + \frac{K_d}{T_s}(e[k] - 2e[k-1] + e[k-2])$.
+    * *Discrete Controller Difference Equation:* $u[k] = u[k-1] + K_p(e[k] - e[k-1]) + K_i T_s e[k] + \frac{K_d}{T_s}(e[k] - 2e[k-1] + e[k-2])$.
+    * *Transfer Function / Dynamic Model:* $G(s) = \frac{K}{\tau s + 1}$ or $G(z) = \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1}}$ with parameterized damping ratio $\zeta$, natural frequency $\omega_n$, and settling time $T_s$.
     * *State Transition Equations:* Explicit conditional guarding logic ($[TOF_{left} < d_{thresh} \land |v| > 0] \rightarrow \text{ALIGN}$).
 
 ---
@@ -134,6 +139,7 @@ To achieve an ECSA GA3 pass, a student must demonstrate competence across **all 
 * **Common Pitfalls:**
   
   * **"It Worked" Claims without Data:** Stating that the mouse completed the run successfully without showing numbers, plots, or metrics.
+  * **Single-Run Anecdotes:** Reporting a single test result without assessing repeatability or error bounds.
   * **Ignoring Discrepancies:** Failing to discuss the differences between the ideal theoretical model and the messy physical robot.
   
 * **What Meets the Standard:**
@@ -149,8 +155,28 @@ To achieve an ECSA GA3 pass, a student must demonstrate competence across **all 
 * **Rules to Follow:**
   
   * **Do Not Disable Form Protection:** Do not modify Word form boundaries, alter field names, or delete template tables.
-  * **Strict Character Limits:** Ensure your text does not exceed the designated character caps. Truncated text cannot receive credit.
+  * **Strict Character Limits:** Ensure your text does not exceed the designated character caps.
+  * **Avoid Page Disruption & Overflow:** When exporting to PDF, verify that content does not spill across unintended page boundaries or shift tables onto additional pages.
   * **Coherent Storyline:** Ensure the subsystem described in Section 1 matches the criteria in Section 3, the assumptions in Section 4, the options in Section 5, the equations in Section 6, and the data in Section 7.
+
+---
+
+### Assessor Auditing Protocols & Academic Standards
+
+To ensure complete fairness, rigor, and defensibility during ECSA accreditation audits:
+
+1. **Strict Adherence to Standards (No Grade Inflation):**
+   * Reviewing a query or auditing a submission must not result in arbitrary mark increases. High academic standards are strictly maintained.
+   * If an answer lacks first-principles mathematics, quantitative test data, or structured trade-off evaluation, the corresponding sub-minimum deficiency must be upheld.
+
+2. **Verification of Apparent "Missing" Sections (PDF Page Overflow):**
+   * When Word documents are converted to PDF with extra line breaks or formatting shifts, content from Section 7 or visual figures can spill over onto subsequent pages (e.g., Page 10).
+   * Assessors must thoroughly inspect adjacent and subsequent pages before assigning a zero mark, ensuring that genuine student work is evaluated.
+   * Template formatting overflow is penalized under Section 8 (Quality & Compliance), not through false technical zeroes in Sections 2–7.
+
+3. **Human-Centric Academic Feedback:**
+   * All written feedback must be constructive, concise, and written in natural academic English.
+   * Raw internal reasoning tokens, AI-style boilerplates, and unrendered LaTeX source strings are strictly prohibited in student-facing comments.
 
 ---
 
@@ -160,7 +186,7 @@ Before converting your Word document to PDF and submitting to Gradescope, check:
 
 - [ ] Every technical section (Sections 3–7) contains specific numbers and physical units.
 - [ ] Section 2 (Page 4 diagram) is explicitly cited and discussed in the body text (e.g., *"As shown in Figure 1..."*).
-- [ ] Section 5 contains a structured decision / trade-off matrix comparing at least two options.
-- [ ] Section 6 contains explicit first-principles governing mathematical formulas (differential kinematics, difference equations, or state transition guards).
-- [ ] Section 7 contains quantitative test metrics comparing expected vs. measured performance.
-- [ ] Form protection was maintained and no text exceeds character limits.
+- [ ] Section 5 contains a structured decision / trade-off matrix or rigorously justified multi-criteria comparison comparing at least two options.
+- [ ] Section 6 contains explicit first-principles governing mathematical formulas (differential kinematics, discrete difference equations, transfer functions, or state transition guards).
+- [ ] Section 7 contains quantitative test metrics comparing expected vs. measured performance across experimental trials.
+- [ ] Form protection was maintained, text is within character limits, and no page overflow occurred.

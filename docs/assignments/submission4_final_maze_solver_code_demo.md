@@ -4,38 +4,65 @@
 ---
 
 ### 1. Objective
-Design and implement the complete autonomous intelligence for your Micromouse. The robot must explore a 4x6 grid maze to discover its wall layout, build a topological map of the grid, calculate the optimal shortest path back to the starting cell (or to the target cell), and execute a high-speed "solving run" without colliding with any walls.
+Design and implement the complete autonomous intelligence for your Micromouse. The robot must explore a **4x6 grid maze** ($0.8\text{ m} \times 1.2\text{ m}$) to discover its wall layout, identify the **2x2 open target room**, confirm target acquisition with a **$360^\circ$ victory pirouette**, calculate the optimal shortest path back to the starting cell `(0,0)`, and execute a high-speed "solving sprint" directly to the target.
 
 #### **Specific Learning Objectives:**
 * Interfacing with three VL53L0X Time-of-Flight (ToF) sensors and calibrating wall detection thresholds.
-* Fusing high-resolution wheel encoders with the gyroscope yaw rate to track coordinate state $(x, y)$ and heading orientation (North, East, South, West).
-* Implementing grid-based exploration state machines (e.g. Floodfill or Depth-First Search).
+* Fusing high-resolution wheel encoders with the gyroscope yaw rate to track coordinate state $(x, y)$ and heading orientation.
+* Implementing dynamic topological exploration state machines (e.g. Floodfill or Depth-First Search).
+* Implementing online feature recognition to detect the 2x2 open target room (missing interior cross-walls).
 * Implementing shortest-path planning solvers (e.g., A*, Dijkstra, or BFS) to calculate optimal routing.
-* Tuning velocity profiles (accelerations, corner deceleration limits) to transition smoothly between straight segments and cornering.
+* Tuning continuous velocity profiles (accelerations, corner deceleration limits) to merge consecutive straight segments during the speed sprint.
 
 ---
 
-### 2. Step-by-Step Implementation Guide
+### 2. The 4-Stage Autonomous Mission: "Search, Celebrate & Sprint"
 
-#### **Step 1: Exploration & Mapping Run**
-* Place your mouse at the starting cell $(0,0)$.
-* The mouse must autonomously explore the 4x6 maze. As it enters each cell, it must read its ToF sensors, classify wall presence, and update its internal map array.
-* Implement active wall-centering using side ToF measurements to dynamically correct steering drift.
+```text
+┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
+│  Phase 1: Exploration   │ ──► │  Target Acknowledgment  │ ──► │   Phase 2: Return Run   │
+│ (Explore from (0,0) and │     │ (Execute a 360° spin in │     │ (Compute shortest path  │
+│  detect 2x2 target room)│     │  the 2x2 target plaza)  │     │  and navigate to (0,0)) │
+└─────────────────────────┘     └─────────────────────────┘     └─────────────────────────┘
+                                                                             │
+                                                                             ▼
+                                                                ┌─────────────────────────┐
+                                                                │  Phase 3: Speed Sprint  │
+                                                                │ (Pause 3s at start, then│
+                                                                │  sprint fast to target) │
+                                                                └─────────────────────────┘
+```
 
-#### **Step 2: Path Solving**
-* Once exploration is completed, your algorithm must import the mapped grid matrix.
-* Calculate the shortest path from the starting cell $(0,0)$ to the target cell.
-* Return the mouse autonomously to $(0,0)$, re-align heading orientation, and halt to prepare for the speed sprint.
+#### **Phase 1: Autonomous Exploration & Mapping (Start at `(0,0)`)**
+* Place your mouse in starting cell `(0,0)` facing North.
+* The mouse must autonomously explore the 4x6 maze. As it enters each cell, it reads its ToF sensors, classifies wall presence, updates its internal map matrix, and applies active side-wall centering.
+* **Target Feature Discovery:** The target is a **2x2 block of contiguous cells with all internal dividing walls removed**. The target location is not fixed and must be dynamically discovered through your wall map.
 
-#### **Step 3: High-Speed Speed Run**
-* Load the calculated shortest path array.
-* Execute a high-speed sprint directly to the target cell.
-* Your velocity planner must merge consecutive straight cells into a single acceleration-cruise-deceleration profile (rather than stopping at every cell boundary).
-* The run is successfully complete when the mouse stops autonomously and safely within the target cell.
+#### **Phase 2: Target Recognition Handshake ($360^\circ$ Pirouette)**
+* Upon entering the 2x2 open target room, the mouse must **halt and execute an on-the-spot $360^\circ$ clockwise pirouette** using integrated gyro feedback. This provides clear, unambiguous confirmation to the autograder and tutors that the robot recognized the target zone.
+
+#### **Phase 3: Autonomous Return-to-Start**
+* Using its discovered topological map, the mouse calculates the shortest path from the target room back to starting cell `(0,0)`.
+* It traverses back to `(0,0)`, turns to face North, and halts.
+
+#### **Phase 4: High-Speed Solving Sprint**
+* The mouse pauses at `(0,0)` for **3.0 seconds** to reset its state.
+* It executes a high-speed sprint along the optimal path directly into the target zone, merging straight corridors into continuous acceleration-cruise-deceleration profiles.
+* The mission completes when the mouse comes to a full stop inside the target room.
 
 ---
 
-### 3. Deliverables (Gradescope Submission)
+### 3. Final Week Micromouse Championship Competition
+
+> [!IMPORTANT]
+> **Final Week Live Championship Tournament:**
+> In the final week of the course, we will host the live **2026 EEE3097S Micromouse Championship Competition**!
+> * **The Challenge:** Robots will compete under the exact same 4-stage mission rules (*Search $\rightarrow 360^\circ$ Pirouette $\rightarrow$ Return $\rightarrow$ Sprint*), but on a **larger competition maze (e.g. 8x8 or 10x10)**!
+> * **Design for Scalability:** Do **NOT** hardcode your code to 4x6 grid dimensions or fixed coordinates. Ensure your `MazeSolver` class dynamically parameterizes grid dimensions (`MAZE_ROWS`, `MAZE_COLS`) and relies strictly on dynamic topological wall discovery.
+
+---
+
+### 4. Deliverables (Gradescope Submission)
 To package your final submission, run the following command from your repository root:
 ```bash
 python tools/package_submission.py --task final_demo --src workspace/final_task/
@@ -54,50 +81,71 @@ You are highly encouraged to test your algorithm against the grading suite local
 ```bash
 python tools/autograder/grade_runner.py
 ```
-This script runs the local simulator backend, automatically detects and executes your code from **`workspace/final_task/`**, runs it through the test scenarios, and outputs the resulting score sheet directly to your terminal.
-
-*Note: If you want to run the autograder on a different folder (e.g. a solutions or test directory), you can override the source folder using the `--submission` flag:*
-```bash
-python tools/autograder/grade_runner.py --submission path/to/your/folder
-```
 
 ---
 
-### 4. Video Requirements & Academic Honesty Declaration
+### 5. Hardware vs. Simulation Parity & System Identification
+
+> [!IMPORTANT]
+> **Why Open-Loop Timing Fails:**
+> If you attempt to solve the maze using fixed time delays (e.g. `set_motors(70, 70); delay_ms(1200)` to travel 1 cell), your code will fail on both physical hardware and simulation.
+> * **Physical Hardware:** Experiences battery voltage decay ($8.4\text{V} \rightarrow 7.0\text{V}$), caster stiction, motor cogging, and wheel slip.
+> * **Simulation Engine:** Injects motor deadband thresholds ($58–62\text{ PWM}$), gain asymmetry ($\pm 8\%$), transient starting slip, and IMU noise.
+> * **The Solution:** Use **closed-loop feedback control**! Your mouse must compute displacement from wheel encoders, integrate yaw heading from the gyroscope, and continuously regulate side-wall centering errors using ToF range measurements. A robust closed-loop controller performs identically on physical silicon and in simulation.
+
+#### **Optional: Submitting Identified Chassis Dynamics (`sim_config.json`)**
+As part of senior engineering design and system identification, you may optionally include a custom **`sim_config.json`** file in your workspace. When submitted, the Gradescope simulator will load your identified chassis parameters (e.g. measured wheel radius $R$, track width $L$, deadbands, and gear ticks-per-rev) to evaluate your simulation run:
+```json
+{
+  "robot": {
+    "axle_half_length": 0.054,
+    "wheel_radius": 0.0325,
+    "ticks_per_rot": 1170.0
+  },
+  "motor": {
+    "dead_band_l": 58.0,
+    "dead_band_r": 62.0
+  }
+}
+```
+*Note: The physical microcontroller ignores `sim_config.json` and runs your closed-loop feedback code directly.*
+
+---
+
+### 6. Video Requirements & Academic Honesty Declaration
 To verify that your physical run is authentic, the video must strictly adhere to the following sequence:
 1. **Student Card Close-up:** The video **MUST start with a clear, readable close-up of your physical Student Card** for at least 3 seconds (declaring this is your own work).
-2. **Setup:** Show the mouse positioned at the starting cell.
-3. **Traversals:** Capture the mapping run, the return-to-start orientation reset, and the final high-speed run to the target cell without cuts.
+2. **Setup:** Show the mouse positioned at starting cell `(0,0)`.
+3. **Traversals:** Capture the full uncut sequence: Phase 1 mapping, $360^\circ$ target pirouette, return to `(0,0)`, 3-second pause, and final high-speed sprint to the target room.
 
 ---
 
-### 5. Code & Log Correlation Verification (Anti-Cheat Check)
+### 7. Code & Log Correlation Verification (Anti-Cheat Check)
 * **Hardware ID Check:** The `"uid"` field represents your microcontroller's unique device ID. While this is not registered in advance, the course convenors check the submitted logs for duplicate UIDs. Submitting logs with identical UIDs under different student accounts indicates shared files/hardware runs and will trigger a plagiarism audit.
 * **Code Match Check:** The autograder compiles and computes an FNV-1a checksum hash of your submitted code and matches it against the `"hash"` field in your telemetry header. **Mismatched hashes will result in an immediate submission rejection.**
 
 ---
 
-### 6. Evaluation Criteria & Grading Rubric
+### 8. Evaluation Criteria & Grading Rubric
 Your Gradescope submission is evaluated across three parts:
 
 * **Part A: Co-Simulation Speed & Accuracy (60% of Milestone Mark):**
-  Your solver is tested in procedurally generated mazes under perturbations. The simulation runs up to a **90-second limit** and automatically completes when the mouse is detected to be **stationary for 3.0 seconds** after initial movement.
+  Your solver is tested in procedurally generated 4x6 virtual mazes under realistic physical perturbations ($8\%$ motor asymmetry, $2\%$ wheel slip). The simulation runs up to a **90-second limit**.
   
   The autograder score is calculated out of 100 points as follows:
-  * **Exploration Progress Score (80 points max):** Graded proportionally based on the closest distance the mouse achieves to the maze center zone $(1.0, 1.0)$ during the run. Reaching the center zone awards the full **80 pts**.
-  * **Speed Run Traversal Bonus (20 points max):** Unlocked only if the center is successfully reached. Evaluated continuously based on the simulation elapsed time:
-    * $\text{Time} \le 30.0$ seconds: Full **20 pts**
-    * $30.0\text{ s} < \text{Time} \le 90.0\text{ s}$: Scales linearly from **20 down to 5 pts**
-    * $\text{Time} > 90.0$ seconds: **0 pts**
+  * **Target Room Discovery (30 points):** Awarded for navigating into the 2x2 target room during exploration.
+  * **Recognition Pirouette (20 points):** Awarded for executing the $360^\circ$ clockwise spin inside the target room.
+  * **Autonomous Return-to-Start (20 points):** Awarded for navigating back and stopping inside starting cell `(0,0)`.
+  * **High-Speed Solving Sprint (20 points):** Awarded for sprinting from `(0,0)` directly back into the target room.
+  * **Total Time Speed Bonus (10 points):** Scales continuously based on total elapsed mission time ($\le 25\text{s} = 10\text{ pts}$, $25\text{s} < t \le 90\text{s} = 10 \rightarrow 0\text{ pts}$).
   * **Applied Penalties:**
-    * **Timeout Penalty ($-10$ points):** Subtracted if the controller fails to stop within the 90-second limit.
-    * *Collision Note:* Contacting a wall halts the simulation immediately, naturally capping your score based only on the progress achieved prior to the crash. No additional numerical collision penalties are subtracted.
+    * **Timeout Penalty ($-10$ points):** Subtracted if the mission exceeds the 90-second limit.
+    * *Collision Note:* Contacting a wall halts the simulation immediately, capping the score at the milestones achieved prior to the crash.
 
 * **Part B: Physical Run Verification (30% of Milestone Mark):**
-  Tutors will evaluate your submitted physical demonstration video (`run_video.mp4`) and verify hardware exploration and solving speed-run performance. Marks are awarded for active wall-centering, mapping reliability, correct shortest-path planning, and successful high-speed sprint to the target cell without manual assists or crashes.
+  Tutors evaluate your submitted physical demonstration video (`run_video.mp4`) against the 4-stage mission: active wall-centering, mapping reliability, $360^\circ$ recognition pirouette, return-to-start navigation, and high-speed sprint.
 
 * **Part C: Submission Compliance (10% of Milestone Mark):**
-  Evaluated by tutors on instruction compliance:
   * **All Files Included (5%):** Correct zipping of source code workspace and valid FNV-1a checksum matched physical telemetry log file (`run_log.jsonl`).
   * **Student Card Close-up (5%):** The physical demo video begins with a clear, readable 3-second close-up of your Student Card.
 

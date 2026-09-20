@@ -40,6 +40,7 @@ def main():
     simulink_models = []
     ert_rtw_dirs = []
     log_file = None
+    config_file = None
 
     for root, dirs, files in os.walk(src_dir):
         for d in dirs:
@@ -53,6 +54,8 @@ def main():
                 simulink_models.append(full_path)
             elif f == "run_log.jsonl":
                 log_file = full_path
+            elif f in ["sim_config.json", "simulation_config.json"]:
+                config_file = full_path
 
     # Also search central build directory for Simulink code generation if not in workspace
     if not ert_rtw_dirs:
@@ -124,9 +127,12 @@ def main():
             
     try:
         with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # 1. Add log file
+            # 1. Add log file and simulation config
             if log_file:
                 zipf.write(log_file, "run_log.jsonl")
+            if config_file:
+                zipf.write(config_file, "sim_config.json")
+                print(f"Packaged Custom Dynamic Configuration: sim_config.json")
                 
             # 2. Add Python files recursively
             if is_python:

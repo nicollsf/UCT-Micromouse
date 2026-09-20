@@ -39,7 +39,8 @@
     }
   ],
   "maze": {
-    "grid_size": 10,
+    "grid_rows": 4,
+    "grid_cols": 6,
     "block_dim": 0.20,
     "wall_thickness": 0.006
   },

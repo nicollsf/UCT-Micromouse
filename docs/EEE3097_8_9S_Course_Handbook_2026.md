@@ -135,13 +135,17 @@ To satisfy the ECSA Graduate Attribute 3 (Design) accreditation portfolio, you m
 *   **Assessment & Passing Criteria:** Evaluated against the ECSA GA3 Design rubric. Must demonstrate implementation testing (3.4) and critical evaluation (3.5). One resubmission of this report is permitted if required to demonstrate Graduate Attribute competence.
 
 ### **Submission 4: Final Maze Solver Code & Demo (25%)**
-*   **Task:** Navigate a virtual/physical mouse to explore a 4x6 grid maze, map wall configurations, compute the shortest path, and run from start to target at high speed.
+*   **Task:** Navigate a virtual/physical mouse through the 4-stage autonomous mission (*Explore & Discover 2x2 Target Room $\rightarrow 360^\circ$ Recognition Pirouette $\rightarrow$ Return to Start `(0,0)` $\rightarrow$ High-Speed Solving Sprint*).
+*   **Final Week Micromouse Championship:** In the final week of the course, we will host a live competition on a **larger competition maze (e.g. 8x8 or 10x10)** using the exact same 4-stage mission rules. Design your code to dynamically parameterize grid dimensions (`MAZE_ROWS`, `MAZE_COLS`) rather than hardcoding to 4x6!
 *   **Assessment & Grading Metric:** The milestone mark is split as **60% Autograded Trajectory**, **30% Tutor Physical Run Evaluation**, and **10% Submission Compliance** (proper files and student card shown).
-    *   *Autograder Score (100 pts max):* Checked in procedurally generated mazes. Completes automatically when the mouse stops for 3.0s:
-        *   **Exploration Progress (80 pts max):** Graded proportionally based on the closest distance achieved to the maze center zone $(1.0, 1.0)$. Reaching the center zone awards the full 80 pts.
-        *   **Speed Run Bonus (20 pts max):** Unlocked if center is reached. Scales continuously from 20 pts (time $\le 30$s) to 0 pts (time $\ge 90$s).
-        *   *Penalties:* -10 pts for timeout (90s limit); Wall contact immediately halts the simulation, naturally capping the score.
-    *   *Physical Run (30%):* Tutor evaluation of active wall-centering, mapping, shortest-path solving, and speed run.
+    *   *Autograder Score (100 pts max):* Checked in procedurally generated 4x6 virtual mazes under physical perturbations:
+        *   **Target Room Discovery (30 pts):** Successfully navigating into the 2x2 target room during exploration.
+        *   **Recognition Pirouette (20 pts):** Executing the $360^\circ$ clockwise spin inside the target room.
+        *   **Return to Start (20 pts):** Navigating back and stopping at starting cell `(0,0)`.
+        *   **High-Speed Sprint (20 pts):** Sprinting from `(0,0)` directly back into the target room.
+        *   **Speed Run Bonus (10 pts):** Scales continuously based on total elapsed mission time ($\le 25\text{s} = 10\text{ pts}$, $25\text{s} < t \le 90\text{s} = 10 \rightarrow 0\text{ pts}$).
+        *   *Penalties:* -10 pts for timeout (90s limit); Wall contact immediately halts the simulation.
+    *   *Physical Run (30%):* Tutor evaluation of the 4-stage mission on the physical 4x6 board.
     *   *Compliance (10%):* Legible 3s student card close-up (5%) and code-telemetry log zip formatting (5%).
 
 *   *Note on Grading Thresholds:* The grading thresholds, coefficients, and parameter metrics detailed in this handbook serve as baseline targets. Course staff reserve the right to tailor or adjust specific parameters post-submission to ensure final grades remain highly representative of actual design and hardware performance.
